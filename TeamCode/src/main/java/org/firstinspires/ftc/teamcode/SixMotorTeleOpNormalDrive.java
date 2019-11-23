@@ -3,10 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp
 public class SixMotorTeleOpNormalDrive extends OpMode{
+
+    private static final double intakePower = 1.0;
 
     private DcMotor leftDriveMiddle = null;
     private DcMotor rightDriveMiddle = null;
@@ -18,6 +21,9 @@ public class SixMotorTeleOpNormalDrive extends OpMode{
 
     private boolean lastPowerToggle = false;
     private boolean isIntakePowerOn = false;
+    private boolean lastDirectionToggle = false;
+    private int intakeDirection = 1;
+    private double currentIntakePower = 0;
 
     @Override
     public void init() {
@@ -42,6 +48,7 @@ public class SixMotorTeleOpNormalDrive extends OpMode{
         rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addData("Status", "Initialized");
     }
@@ -58,6 +65,13 @@ public class SixMotorTeleOpNormalDrive extends OpMode{
         setDriveMotorPower(leftPower,rightPower);
 
         processIntake();
+        intakeDirection();
+        intake.setPower(currentIntakePower * intakeDirection);
+
+        telemetry.addData("Is intake on", lastPowerToggle);
+        telemetry.addData("Intake Motor Power", "%.2f", intake.getPower());
+        telemetry.addData("Is intake forward",lastDirectionToggle);
+        telemetry.addData("Intake Motor Direction", intakeDirection);
     }
 
 
@@ -79,18 +93,34 @@ public class SixMotorTeleOpNormalDrive extends OpMode{
         }
         lastPowerToggle = current;
 
-        telemetry.addData("power toggle",lastPowerToggle);
-        telemetry.addData("Intake Motor Power",intake.getPower());
     }
 
     private void toggleIntakePower() {
         if (isIntakePowerOn == true) {
             isIntakePowerOn = false;
-            intake.setPower(0);
+            currentIntakePower = 0;
         } else {
             isIntakePowerOn = true;
-            intake.setPower(1);
+            currentIntakePower = (intakeDirection * intakePower);
         }
     }
 
+    private void intakeDirection () {
+        boolean current = gamepad1.y;
+        if (current == lastDirectionToggle) {
+            return;
+        } else if (lastDirectionToggle == false && current == true) {
+            toggleIntakeDirection ();
+        }
+        lastDirectionToggle = current;
+
+    }
+
+    private void toggleIntakeDirection() {
+        if (intakeDirection == 1) {
+             intakeDirection = -1;
+        } else {
+            intakeDirection = 1;
+        }
+    }
 }
