@@ -32,6 +32,8 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
     private boolean driveToDepotToggle = false;
     private boolean driveToDepotLastValue = false;
 
+    private boolean encodersAreBusy = false;
+
     @Override
     public void init() {
 
@@ -97,7 +99,7 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
         boolean current = gamepad1.b;
         if (current == lastPowerToggle) {
             return;
-        } else if (lastPowerToggle == false && current == true) {
+        } else if (!lastPowerToggle && current) {
             toggleIntakePower();
         }
         lastPowerToggle = current;
@@ -134,13 +136,13 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
     }
 
     private boolean driveToDepot() {
-        final double driveSpeed = 0.5;
+        final double driveSpeed = 1.0;
         final double turnSpeed = 0.5;
 
         boolean current = gamepad1.x;
         if (current == driveToDepotToggle) {
 
-        } else if (!driveToDepotToggle && current) {
+        } else if (!driveToDepotToggle && current && !encodersAreBusy) {
 
             leftDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -152,9 +154,66 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
         driveToDepotToggle = current;
 
 
-        return encoderDrive(driveSpeed, 76, 76, 2.0);
+        return encoderDrive(driveSpeed, 76-(.2*12), 76-(.2*12), 5.0); //44.091603053   take off 12 for skidding
 
     }
+
+//    int newLeftTarget;
+//    int newRightTarget;
+//    boolean followingEncoders = false;
+//    boolean inMotion = false;
+//
+//    public boolean encoderDrive(double speed,
+//                                double leftInches, double rightInches,
+//                                double timeoutS) {
+//        if (gamepad1.x) {
+//            if (!inMotion) {
+//                newLeftTarget = leftDriveMiddle.getCurrentPosition() + (int) (leftInches * countsPerInch);
+//                newRightTarget = rightDriveMiddle.getCurrentPosition() + (int) (rightInches * countsPerInch);
+//                leftDriveMiddle.setTargetPosition(newLeftTarget);
+//                rightDriveMiddle.setTargetPosition(newRightTarget);
+//                leftDriveMiddle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                rightDriveMiddle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                leftDriveMiddle.setPower(Math.abs(speed));
+//                rightDriveMiddle.setPower(Math.abs(speed));
+//                leftDriveFront.setPower(Math.abs(speed));
+//                rightDriveFront.setPower(Math.abs(speed));
+//                leftDriveBack.setPower(Math.abs(speed));
+//                rightDriveBack.setPower(Math.abs(speed));
+//
+//                double startTime = getRuntime();
+//            } else if (inMotion) {
+//                telemetry.addData("Path1", "Running to %7d :%7d", leftDriveMiddle.getTargetPosition(), rightDriveMiddle.getTargetPosition());
+//                telemetry.addData("Path2", "Running at %7d :%7d",
+//                        leftDriveMiddle.getCurrentPosition(),
+//                        rightDriveMiddle.getCurrentPosition());
+//                telemetry.update();
+//            }
+//            if (driveToDepotToggle && !inMotion) {
+//                leftDriveMiddle.setPower(0);
+//                rightDriveMiddle.setPower(0);
+//                leftDriveFront.setPower(0);
+//                rightDriveFront.setPower(0);
+//                leftDriveBack.setPower(0);
+//                rightDriveBack.setPower(0);
+//
+//                leftDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//                rightDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//                leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//                leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//                leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//                rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//                rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//                rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//                intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            }
+//        }
+//    }
+
+
+
+
 
     public boolean encoderDrive(double speed,
                              double leftInches, double rightInches,
@@ -163,11 +222,16 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
         int newRightTarget;
         boolean followingEncoders = false;
 
-        boolean current = gamepad1.x;
-        if (current == lastDriveToDepotToggle) {
+        boolean currentXvalue = gamepad1.x;
 
-        } else if (!lastDriveToDepotToggle && current) {
+        if(encodersAreBusy) {
+            telemetry.addData("setting x value to false","");
+            currentXvalue = false;
+        }
 
+        if (currentXvalue == lastDriveToDepotToggle) {
+
+        } else if (!lastDriveToDepotToggle && currentXvalue) {
             newLeftTarget = leftDriveMiddle.getCurrentPosition() + (int)(leftInches * countsPerInch);
             newRightTarget = rightDriveMiddle.getCurrentPosition() + (int) (rightInches * countsPerInch);
             leftDriveMiddle.setTargetPosition(newLeftTarget);
@@ -181,19 +245,35 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
             leftDriveBack.setPower(Math.abs(speed));
             rightDriveBack.setPower(Math.abs(speed));
 
+            this.encodersAreBusy = true;
+
             double startTime = getRuntime();
-
         }
-        lastDriveToDepotToggle = current;
-
+        lastDriveToDepotToggle = currentXvalue;
 
 //        while (opModeIsActive() &&
 //                ((getRuntime() - startTime) < timeoutS) &&
 //                (leftDriveMiddle.isBusy() && rightDriveMiddle.isBusy())){
 
         // driveToDepotCurrent == false if encoder drive is done
-        boolean driveToDepotCurrent = !(!leftDriveMiddle.isBusy() && !rightDriveMiddle.isBusy());
-//        if (gamepad1.left_stick_x ||gamepad1.) {
+        boolean driveToDepotCurrent;
+        if(Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) >= 5
+                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) >= 5) {
+            driveToDepotCurrent = true;
+            if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 200
+                    || Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 200) {
+                leftDriveFront.setPower(0);
+                rightDriveFront.setPower(0);
+                leftDriveBack.setPower(0);
+                rightDriveBack.setPower(0);
+            }
+        } else {
+            driveToDepotCurrent = false;
+        }
+
+//        boolean driveToDepotCurrent = (leftDriveMiddle.isBusy() && rightDriveMiddle.isBusy());
+//        boolean driveToDepotCurrent = (leftDriveMiddle.isBusy() || rightDriveMiddle.isBusy());
+//        if (gamepad1.left_stick_y ||gamepad1.right_stick_x) {
 //            driveToDepotCurrent = true;
 //        }
         if(driveToDepotCurrent == this.driveToDepotLastValue) {
@@ -213,11 +293,23 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
             leftDriveBack.setPower(0);
             rightDriveBack.setPower(0);
 
+            this.encodersAreBusy = false;
+
             leftDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+            leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         }
+
         this.driveToDepotLastValue = driveToDepotCurrent;
+        return followingEncoders;
     }
 
 }
