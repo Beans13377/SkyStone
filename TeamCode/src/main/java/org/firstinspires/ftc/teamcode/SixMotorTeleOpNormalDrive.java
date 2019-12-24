@@ -29,10 +29,16 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
     private static final double countsPerInch = countsPerMotorRev / (wheelDiameter * 3.1415);
 
     private boolean lastDriveToDepotToggle = false;
+    private boolean lastDriveToDepotToggleTwo = false;
     private boolean driveToDepotToggle = false;
     private boolean driveToDepotLastValue = false;
+    private boolean driveToDepotLastValueTwo = false;
 
     private boolean encodersAreBusy = false;
+    private boolean encodersAreBusyTwo = false;
+    private int stagesForDrivingToDepot = 0;
+    private boolean driveToDepotCurrent = false;
+    private boolean driveToDepotCurrentTwo = false;
 
     @Override
     public void init() {
@@ -136,8 +142,8 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
     }
 
     private boolean driveToDepot() {
-        final double driveSpeed = 1.0;
-        final double turnSpeed = 0.5;
+        final double driveSpeed = 0.2;
+        final double turnSpeed = 0.2;
 
         boolean current = gamepad1.x;
         if (current == driveToDepotToggle) {
@@ -149,14 +155,29 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
 
             leftDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         }
         driveToDepotToggle = current;
 
+        stagesForDrivingToDepot = 1;
 
-        return encoderDrive(driveSpeed, 76-(.2*12), 76-(.2*12), 5.0); //44.091603053   take off 12 for skidding
-
+        if(stagesForDrivingToDepot == 1) {
+            encoderDrive(driveSpeed, 21-(driveSpeed * 12), 21-(driveSpeed * 12), 4.0); //44.091603053   take off 12 for skidding
+            telemetry.addData("1st Stage", "Running to %7d :%7d", leftDriveMiddle.getTargetPosition(), rightDriveMiddle.getTargetPosition());
+            stagesForDrivingToDepot++;
+        }
+        if (stagesForDrivingToDepot == 2) {
+            leftDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            stagesForDrivingToDepot++;
+        }
+        if (stagesForDrivingToDepot == 3) {
+            encoderDriveTwo(turnSpeed, -4.5 * 3.1415, 4.5 * 3.1415, 2.0);
+            telemetry.addData("3rd Stage", "Running to %7d :%7d", leftDriveMiddle.getTargetPosition(), rightDriveMiddle.getTargetPosition());
+        }
+        return current;
     }
+//        encoderDrive(driveSpeed, 21-(driveSpeed * 12), 21-(driveSpeed * 12), 4.0);
+
 
 //    int newLeftTarget;
 //    int newRightTarget;
@@ -212,54 +233,52 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
 //    }
 
 
+        private boolean encoderDrive( double speed, double leftInches, double rightInches,
+        double timeoutS){
+            int newLeftTarget;
+            int newRightTarget;
+            boolean followingEncoders = gamepad1.x;
 
+            boolean currentXvalue = gamepad1.x;
+            if (encodersAreBusy) {
+                telemetry.addData("setting x value to false", "");
+                currentXvalue = false;
+            }
 
+            if (currentXvalue == lastDriveToDepotToggle) {
 
-    public boolean encoderDrive(double speed,
-                             double leftInches, double rightInches,
-                             double timeoutS) {
-        int newLeftTarget;
-        int newRightTarget;
-        boolean followingEncoders = false;
+            } else if (!lastDriveToDepotToggle && currentXvalue) {
+                newLeftTarget = leftDriveMiddle.getCurrentPosition() + (int) (leftInches * countsPerInch);
+                newRightTarget = rightDriveMiddle.getCurrentPosition() + (int) (rightInches * countsPerInch);
+                leftDriveMiddle.setTargetPosition(newLeftTarget);
+                rightDriveMiddle.setTargetPosition(newRightTarget);
+                leftDriveMiddle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rightDriveMiddle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                leftDriveMiddle.setPower(Math.abs(speed));
+                rightDriveMiddle.setPower(Math.abs(speed));
+                leftDriveFront.setPower(Math.abs(speed));
+                rightDriveFront.setPower(Math.abs(speed));
+                leftDriveBack.setPower(Math.abs(speed));
+                rightDriveBack.setPower(Math.abs(speed));
 
-        boolean currentXvalue = gamepad1.x;
+                this.encodersAreBusy = true;
 
-        if(encodersAreBusy) {
-            telemetry.addData("setting x value to false","");
-            currentXvalue = false;
-        }
-
-        if (currentXvalue == lastDriveToDepotToggle) {
-
-        } else if (!lastDriveToDepotToggle && currentXvalue) {
-            newLeftTarget = leftDriveMiddle.getCurrentPosition() + (int)(leftInches * countsPerInch);
-            newRightTarget = rightDriveMiddle.getCurrentPosition() + (int) (rightInches * countsPerInch);
-            leftDriveMiddle.setTargetPosition(newLeftTarget);
-            rightDriveMiddle.setTargetPosition(newRightTarget);
-            leftDriveMiddle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightDriveMiddle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            leftDriveMiddle.setPower(Math.abs(speed));
-            rightDriveMiddle.setPower(Math.abs(speed));
-            leftDriveFront.setPower(Math.abs(speed));
-            rightDriveFront.setPower(Math.abs(speed));
-            leftDriveBack.setPower(Math.abs(speed));
-            rightDriveBack.setPower(Math.abs(speed));
-
-            this.encodersAreBusy = true;
-
-            double startTime = getRuntime();
-        }
-        lastDriveToDepotToggle = currentXvalue;
+                //double startTime = getRuntime();
+            }
+            lastDriveToDepotToggle = currentXvalue;
 
 //        while (opModeIsActive() &&
 //                ((getRuntime() - startTime) < timeoutS) &&
 //                (leftDriveMiddle.isBusy() && rightDriveMiddle.isBusy())){
 
-        // driveToDepotCurrent == false if encoder drive is done
-        boolean driveToDepotCurrent;
-        if(Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) >= 5
-                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) >= 5) {
-            driveToDepotCurrent = true;
+            // driveToDepotCurrent == false if encoder drive is done
+
+            if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) >= 5
+                    && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) >= 5) {
+                driveToDepotCurrent = true;
+            } else {
+                driveToDepotCurrent = false;
+            }
             if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 200
                     || Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 200) {
                 leftDriveFront.setPower(0);
@@ -267,8 +286,97 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
                 leftDriveBack.setPower(0);
                 rightDriveBack.setPower(0);
             }
+
+//        boolean driveToDepotCurrent = (leftDriveMiddle.isBusy() && rightDriveMiddle.isBusy());
+//        boolean driveToDepotCurrent = (leftDriveMiddle.isBusy() || rightDriveMiddle.isBusy());
+//        if (gamepad1.left_stick_y ||gamepad1.right_stick_x) {
+//            driveToDepotCurrent = true;
+//        }
+            if (driveToDepotCurrent == this.driveToDepotLastValue) {
+                if (driveToDepotCurrent) {
+                    telemetry.addData("Path1", "Running to %7d :%7d", leftDriveMiddle.getTargetPosition(), rightDriveMiddle.getTargetPosition());
+                    telemetry.addData("Path2", "Running at %7d :%7d",
+                            leftDriveMiddle.getCurrentPosition(),
+                            rightDriveMiddle.getCurrentPosition());
+                    telemetry.update();
+                }
+            } else if (this.driveToDepotLastValue && !driveToDepotCurrent) {
+                leftDriveMiddle.setPower(0);
+                rightDriveMiddle.setPower(0);
+                leftDriveFront.setPower(0);
+                rightDriveFront.setPower(0);
+                leftDriveBack.setPower(0);
+                rightDriveBack.setPower(0);
+
+                this.encodersAreBusy = false;
+
+                leftDriveMiddle.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                rightDriveMiddle.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            }
+
+            this.driveToDepotLastValue = driveToDepotCurrent;
+            return followingEncoders;
+        }
+    private boolean encoderDriveTwo( double speed, double leftInches, double rightInches,
+                                       double timeoutS){
+        int newLeftTarget;
+        int newRightTarget;
+
+        boolean currentXvalue = gamepad1.x;
+        if (encodersAreBusyTwo) {
+            telemetry.addData("setting x value to false", "");
+            currentXvalue = false;
+        }
+
+        if (currentXvalue == lastDriveToDepotToggleTwo) {
+
+        } else if (!lastDriveToDepotToggleTwo && currentXvalue) {
+            newLeftTarget = leftDriveMiddle.getCurrentPosition() + (int) (leftInches * countsPerInch);
+            newRightTarget = rightDriveMiddle.getCurrentPosition() + (int) (rightInches * countsPerInch);
+            leftDriveMiddle.setTargetPosition(newLeftTarget);
+            rightDriveMiddle.setTargetPosition(newRightTarget);
+            leftDriveMiddle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightDriveMiddle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftDriveMiddle.setPower(Math.abs(speed));
+            rightDriveMiddle.setPower(Math.abs(speed));
+            leftDriveFront.setPower(-Math.abs(speed));
+            rightDriveFront.setPower(Math.abs(speed));
+            leftDriveBack.setPower(-Math.abs(speed));
+            rightDriveBack.setPower(Math.abs(speed));
+
+            this.encodersAreBusyTwo = true;
+
+            //double startTime = getRuntime();
+        }
+        lastDriveToDepotToggleTwo = currentXvalue;
+
+//        while (opModeIsActive() &&
+//                ((getRuntime() - startTime) < timeoutS) &&
+//                (leftDriveMiddle.isBusy() && rightDriveMiddle.isBusy())){
+
+        // driveToDepotCurrent == false if encoder drive is done
+
+        if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) >= 5
+                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) >= 5) {
+            driveToDepotCurrentTwo = true;
         } else {
-            driveToDepotCurrent = false;
+            driveToDepotCurrentTwo = false;
+        }
+        if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 200
+                || Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 200) {
+            leftDriveFront.setPower(0);
+            rightDriveFront.setPower(0);
+            leftDriveBack.setPower(0);
+            rightDriveBack.setPower(0);
         }
 
 //        boolean driveToDepotCurrent = (leftDriveMiddle.isBusy() && rightDriveMiddle.isBusy());
@@ -276,16 +384,15 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
 //        if (gamepad1.left_stick_y ||gamepad1.right_stick_x) {
 //            driveToDepotCurrent = true;
 //        }
-        if(driveToDepotCurrent == this.driveToDepotLastValue) {
-            if(driveToDepotCurrent) {
-                telemetry.addData("Path1",  "Running to %7d :%7d", leftDriveMiddle.getTargetPosition(),  rightDriveMiddle.getTargetPosition());
-                telemetry.addData("Path2",  "Running at %7d :%7d",
+        if (driveToDepotCurrentTwo == this.driveToDepotLastValueTwo) {
+            if (driveToDepotCurrentTwo) {
+                telemetry.addData("Path1", "Running to %7d :%7d", leftDriveMiddle.getTargetPosition(), rightDriveMiddle.getTargetPosition());
+                telemetry.addData("Path2", "Running at %7d :%7d",
                         leftDriveMiddle.getCurrentPosition(),
                         rightDriveMiddle.getCurrentPosition());
                 telemetry.update();
             }
-        }
-        else if (this.driveToDepotLastValue && !driveToDepotCurrent) {
+        } else if (this.driveToDepotLastValueTwo && !driveToDepotCurrentTwo) {
             leftDriveMiddle.setPower(0);
             rightDriveMiddle.setPower(0);
             leftDriveFront.setPower(0);
@@ -293,10 +400,10 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
             leftDriveBack.setPower(0);
             rightDriveBack.setPower(0);
 
-            this.encodersAreBusy = false;
+            this.encodersAreBusyTwo = false;
 
-            leftDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftDriveMiddle.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightDriveMiddle.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -308,8 +415,8 @@ public class SixMotorTeleOpNormalDrive extends OpMode {
 
         }
 
-        this.driveToDepotLastValue = driveToDepotCurrent;
-        return followingEncoders;
+        this.driveToDepotLastValueTwo = driveToDepotCurrentTwo;
+        return currentXvalue;
     }
 
-}
+    }
