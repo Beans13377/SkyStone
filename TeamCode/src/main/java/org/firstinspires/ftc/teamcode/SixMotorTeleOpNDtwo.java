@@ -17,8 +17,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
     private DcMotor rightDriveBack = null;
     private DcMotor intake = null;
     private Servo outake = null;
-    private Servo capstoneGrabber = null;
-    private Servo capstoneReleaseBar = null;
+    private Servo capstoneRelease = null;
 
     private boolean lastPowerToggle = false;
     private boolean isIntakePowerOn = false;
@@ -52,8 +51,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         rightDriveBack = hardwareMap.get(DcMotor.class, "right_drive_back");
         intake = hardwareMap.get(DcMotor.class, "intake");
         outake = hardwareMap.servo.get ("outake");
-        capstoneGrabber = hardwareMap.servo.get ("capstoneGrabber");
-        capstoneReleaseBar = hardwareMap.servo.get ("capstoneReleaseBar");
+        capstoneRelease = hardwareMap.servo.get ("capstoneRelease");
         leftDriveMiddle.setDirection(DcMotor.Direction.FORWARD);
         rightDriveMiddle.setDirection(DcMotor.Direction.REVERSE);
         leftDriveFront.setDirection(DcMotor.Direction.FORWARD);
@@ -76,7 +74,10 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
-
+    @Override
+    public void start () {
+        capstoneRelease.setPosition(.6);
+    }
     public void loop () {
         processIntake();
         intakeDirection();
@@ -440,10 +441,10 @@ public class SixMotorTeleOpNDtwo extends OpMode {
     }
     private void releaseCapstone () {
         if (gamepad1.x) {
-            capstoneReleaseBar.setPosition(1);
-            if (capstoneReleaseBar.getPosition() == 1) {
-                capstoneGrabber.setPosition(0);
-            }
+            capstoneRelease.setPosition(.6);
+        }
+        else if (gamepad1.y) {
+            capstoneRelease.setPosition(.1);
         }
     }
 }
