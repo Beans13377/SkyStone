@@ -18,6 +18,8 @@ public class SixMotorTeleOpNDtwo extends OpMode {
     private DcMotor intake = null;
     private Servo outake = null;
     private Servo capstoneRelease = null;
+    private Servo lfoundationater = null;
+    private Servo rfoundationater = null;
 
     private boolean lastPowerToggle = false;
     private boolean isIntakePowerOn = false;
@@ -52,6 +54,8 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         intake = hardwareMap.get(DcMotor.class, "intake");
         outake = hardwareMap.servo.get ("outake");
         capstoneRelease = hardwareMap.servo.get ("capstoneRelease");
+        lfoundationater = hardwareMap.servo.get("lfoundationater");
+        rfoundationater = hardwareMap.servo.get("rfoundationater");
         leftDriveMiddle.setDirection(DcMotor.Direction.FORWARD);
         rightDriveMiddle.setDirection(DcMotor.Direction.REVERSE);
         leftDriveFront.setDirection(DcMotor.Direction.FORWARD);
@@ -106,6 +110,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
             leftDriveBack.setPower(leftPower);
             rightDriveBack.setPower(rightPower);
         releaseCapstone();
+        moveFoundation();
     }
 
     private void processIntake() {
@@ -431,11 +436,11 @@ public class SixMotorTeleOpNDtwo extends OpMode {
 //    }
     private void outakeStone () {
         if (gamepad1.right_bumper) {
-            outake.setPosition(1);
+            outake.setPosition(.3);
             telemetry.addData("outake", "closed");
         }
         else if (gamepad1.left_bumper){
-            outake.setPosition(.6);
+            outake.setPosition(.15);
             telemetry.addData("outake", "open");
         }
     }
@@ -445,6 +450,16 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         }
         else if (gamepad1.y) {
             capstoneRelease.setPosition(.1);
+        }
+    }
+    private void moveFoundation () {
+        if (gamepad1.dpad_right) {
+            lfoundationater.setPosition(.1);
+            rfoundationater.setPosition(.9);
+        }
+        else if (gamepad1.dpad_left) {
+            lfoundationater.setPosition(.9);
+            rfoundationater.setPosition(.1);
         }
     }
 }
