@@ -94,9 +94,12 @@ public class MoveFoundationAutoRed extends OpMode{
             encodersAreBusy = true;
         }
 
-        if (autoStage == 0 && Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 360
-                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 360) {
+        if (autoStage == 0 && Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 500
+                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 500) {
             driveSpeed = .2;
+        }
+        else {
+            driveSpeed = .8;
         }
         if (encodersAreBusy) {
             if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 10
