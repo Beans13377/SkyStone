@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
-public class MoveFoundationAutoRed extends OpMode{
+public class MoveFoundationAutoRed extends OpMode {
     private DcMotor leftDriveMiddle = null;
     private DcMotor rightDriveMiddle = null;
     private DcMotor leftDriveFront = null;
@@ -43,6 +43,10 @@ public class MoveFoundationAutoRed extends OpMode{
         capstoneRelease = hardwareMap.servo.get ("capstoneRelease");
         leftDriveMiddle.setDirection(DcMotor.Direction.FORWARD);
         rightDriveMiddle.setDirection(DcMotor.Direction.REVERSE);
+        rightDriveFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightDriveBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftDriveFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftDriveBack.setDirection(DcMotorSimple.Direction.FORWARD);
         leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -63,7 +67,7 @@ public class MoveFoundationAutoRed extends OpMode{
     }
     private void autonomous () {
         if(autoStage == 0) {
-            encoderDrive(driveSpeed, -41, -41);
+            encoderDrive(driveSpeed, -30, -30);
         }
         else if (autoStage == 1) {
             runtime.reset();
@@ -72,7 +76,7 @@ public class MoveFoundationAutoRed extends OpMode{
             autoStage ++;
         }
         else if (autoStage == 2 && runtime.seconds() > 1.5) {
-            encoderDrive(driveSpeed, 32, 32);
+            encoderDrive(driveSpeed, 28, 28);
         }
     }
     private void encoderDrive (double speed, double rightInches, double leftInches) {
@@ -94,12 +98,32 @@ public class MoveFoundationAutoRed extends OpMode{
             encodersAreBusy = true;
         }
 
-        if (autoStage == 0 && Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 500
-                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 500) {
-            driveSpeed = .2;
+        if(leftInches < 0) {
+                leftDriveFront.setPower(-Math.abs(speed));
+                leftDriveBack.setPower(-Math.abs(speed));
         }
         else {
-            driveSpeed = .8;
+            leftDriveFront.setPower(Math.abs(speed));
+            leftDriveBack.setPower(Math.abs(speed));
+        }
+        if (rightInches < 0) {
+            rightDriveFront.setPower(-Math.abs(speed));
+            rightDriveBack.setPower(-Math.abs(speed));
+        }
+        else {
+            rightDriveFront.setPower(Math.abs(speed));
+            rightDriveBack.setPower(Math.abs(speed));
+        }
+        if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 1000
+                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 1000) {
+            driveSpeed = .5;
+            rightDriveFront.setPower(0);
+            rightDriveBack.setPower(0);
+            leftDriveFront.setPower(0);
+            leftDriveBack.setPower(0);
+        }
+        else {
+            driveSpeed = .15;
         }
         if (encodersAreBusy) {
             if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 10
