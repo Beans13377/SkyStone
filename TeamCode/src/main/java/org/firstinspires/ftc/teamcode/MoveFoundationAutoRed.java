@@ -22,8 +22,8 @@ public class MoveFoundationAutoRed extends OpMode {
     private static final double countsPerMotorRev = 383.6;
     private static final double wheelDiameter = 4;
     private static final double countsPerInch = countsPerMotorRev / (wheelDiameter * 3.1415);
-    private static double driveSpeed = .6;
-    private static double turnSpeed = .5;
+    private static double driveSpeed = .15;
+    private static double turnSpeed = .075;
     private boolean encodersAreBusy = false;
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -64,6 +64,8 @@ public class MoveFoundationAutoRed extends OpMode {
     }
     public void loop () {
         autonomous();
+        telemetry.addData("auto stage", autoStage);
+        telemetry.update();
     }
     private void autonomous () {
         if(autoStage == 0) {
@@ -75,8 +77,71 @@ public class MoveFoundationAutoRed extends OpMode {
             rfoundationater.setPosition(.9);
             autoStage ++;
         }
-        else if (autoStage == 2 && runtime.seconds() > 1.5) {
+        else if (autoStage == 2 && runtime.seconds() > 1) {
             encoderDrive(driveSpeed, 28, 28);
+        }
+        else if (autoStage == 3) {
+            encoderDrive(turnSpeed, 2,0);
+        }
+        else if (autoStage == 4) {
+            runtime.reset();
+            lfoundationater.setPosition(.9);
+            rfoundationater.setPosition(.1);
+            autoStage ++;
+        }
+        else if (autoStage == 5 && runtime.seconds() > 1) {
+            encoderDrive(turnSpeed, -4.1875, 4.1875);
+        }
+        else if (autoStage == 6) {
+            encoderDrive (driveSpeed, 12, 12);
+        }
+        else if (autoStage == 7) {
+            encoderDrive(turnSpeed, -4.1875, 4.1875);
+        }
+        else if (autoStage == 8) {
+            encoderDrive(driveSpeed, 24, 24);
+        }
+        else if (autoStage == 9) {
+            encoderDrive(turnSpeed, -4.1875, 4.1875);
+        }
+        else if (autoStage == 10) {
+            encoderDrive(driveSpeed, 12, 12);
+        }
+        else if (autoStage == 11) {
+            encoderDrive(turnSpeed, 4.1875, -4.1875);
+        }
+        else if (autoStage == 12) {
+            runtime.reset();
+            lfoundationater.setPosition(.1);
+            rfoundationater.setPosition(.9);
+            autoStage ++;
+        }
+        else if (autoStage == 13 && runtime.seconds() > 1) {
+            encoderDrive(driveSpeed, -24, -24);
+        }
+        else if (autoStage == 14) {
+            runtime.reset();
+            lfoundationater.setPosition(.9);
+            rfoundationater.setPosition(.1);
+            autoStage ++;
+        }
+        else if (autoStage == 15 && runtime.seconds() > 1) {
+            encoderDrive(turnSpeed, 4.1875, -4.1875);
+        }
+        else if (autoStage == 16) {
+            encoderDrive(driveSpeed, 24, 24);
+        }
+        else if (autoStage == 17) {
+            encoderDrive(turnSpeed, 4.1875, -4.1875);
+        }
+        else if (autoStage == 18) {
+            encoderDrive(driveSpeed, 19, 19);
+        }
+        else if (autoStage == 19) {
+            encoderDrive(turnSpeed, -4.1875, 4.1875);
+        }
+        else if (autoStage == 20) {
+            encoderDrive(driveSpeed, 24,24);
         }
     }
     private void encoderDrive (double speed, double rightInches, double leftInches) {
@@ -98,34 +163,57 @@ public class MoveFoundationAutoRed extends OpMode {
             encodersAreBusy = true;
         }
 
-        if(leftInches < 0) {
-                leftDriveFront.setPower(-Math.abs(speed));
-                leftDriveBack.setPower(-Math.abs(speed));
-        }
-        else {
-            leftDriveFront.setPower(Math.abs(speed));
-            leftDriveBack.setPower(Math.abs(speed));
-        }
-        if (rightInches < 0) {
-            rightDriveFront.setPower(-Math.abs(speed));
-            rightDriveBack.setPower(-Math.abs(speed));
-        }
-        else {
-            rightDriveFront.setPower(Math.abs(speed));
-            rightDriveBack.setPower(Math.abs(speed));
-        }
-        if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 1000
-                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 1000) {
-            driveSpeed = .5;
+
+        if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 500
+                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 500) {
+            driveSpeed = .15;
             rightDriveFront.setPower(0);
             rightDriveBack.setPower(0);
             leftDriveFront.setPower(0);
             leftDriveBack.setPower(0);
-        }
+            rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 90
+                    && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 90) {
+                driveSpeed = .1;
+            }
+    }
         else {
             driveSpeed = .15;
+            if(leftInches < 0) {
+                leftDriveFront.setPower(-Math.abs(speed));
+                leftDriveBack.setPower(-Math.abs(speed));
+            }
+            else {
+                leftDriveFront.setPower(Math.abs(speed));
+                leftDriveBack.setPower(Math.abs(speed));
+            }
+            if (rightInches < 0) {
+                rightDriveFront.setPower(-Math.abs(speed));
+                rightDriveBack.setPower(-Math.abs(speed));
+            }
+            else {
+                rightDriveFront.setPower(Math.abs(speed));
+                rightDriveBack.setPower(Math.abs(speed));
+            }
         }
-        if (encodersAreBusy) {
+        if (autoStage == 0 && leftDriveMiddle.getTargetPosition() > leftDriveMiddle.getCurrentPosition()
+                && rightDriveMiddle.getTargetPosition() > rightDriveMiddle.getCurrentPosition()) {
+            leftDriveMiddle.setPower(0);
+            rightDriveMiddle.setPower(0);
+            leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            encodersAreBusy = false;
+            autoStage ++;
+        }
+        else if (encodersAreBusy) {
             if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 10
                     && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 10) {
 
@@ -133,6 +221,10 @@ public class MoveFoundationAutoRed extends OpMode {
                 rightDriveMiddle.setPower(0);
                 leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
                 encodersAreBusy = false;
                 autoStage ++;
