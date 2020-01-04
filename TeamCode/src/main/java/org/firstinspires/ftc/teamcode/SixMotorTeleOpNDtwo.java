@@ -86,7 +86,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         processIntake();
         intakeDirection();
         intake.setPower(currentIntakePower * intakeDirection);
-        telemetry.addData("Intake Motor Direction", intakeDirection);
+        telemetry.addData("Intake Motor Direction", currentIntakePower);
 
 //        driveToDepot();
 //        telemetry.addData("encodersAreBusy", encodersAreBusy);
@@ -135,7 +135,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
     }
 
     private void intakeDirection() {
-        boolean current = gamepad1.a;
+        boolean current = gamepad1.a || gamepad2.a;
         if (current == lastDirectionToggle) {
             return;
         } else if (!lastDirectionToggle && current) {
@@ -435,11 +435,11 @@ public class SixMotorTeleOpNDtwo extends OpMode {
 //        }
 //    }
     private void outakeStone () {
-        if (gamepad1.right_bumper) {
+        if (gamepad2.right_bumper) {
             outake.setPosition(.3);
             telemetry.addData("outake", "closed");
         }
-        else if (gamepad1.left_bumper){
+        else if (gamepad2.left_bumper){
             outake.setPosition(.15);
             telemetry.addData("outake", "open");
         }
