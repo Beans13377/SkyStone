@@ -86,7 +86,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         processIntake();
         intakeDirection();
         intake.setPower(currentIntakePower * intakeDirection);
-        telemetry.addData("Intake Motor Direction", currentIntakePower);
+        telemetry.addData("Intake Motor Direction", intakeDirection);
 
 //        driveToDepot();
 //        telemetry.addData("encodersAreBusy", encodersAreBusy);
@@ -98,7 +98,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
 //        driveToSkyBridge();
         outakeStone();
         double drive = -gamepad1.left_stick_y;
-            double turn = gamepad1.right_stick_x;
+            double turn = gamepad1.right_stick_x / 2.0;
 
             double leftPower = Range.clip(drive + turn, -1.0, 1.0);
             double rightPower = Range.clip(drive - turn, -1.0, 1.0);

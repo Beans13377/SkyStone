@@ -65,7 +65,7 @@ public class MoveFoundationAutoRed extends OpMode {
     public void loop () {
         autonomous();
         telemetry.addData("auto stage", autoStage);
-        telemetry.update();
+
     }
     private void autonomous () {
         if (autoStage == 0) {
@@ -127,7 +127,6 @@ public class MoveFoundationAutoRed extends OpMode {
 
         if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 500
                 && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 500) {
-            driveSpeed = .15;
             rightDriveFront.setPower(0);
             rightDriveBack.setPower(0);
             leftDriveFront.setPower(0);
@@ -138,11 +137,10 @@ public class MoveFoundationAutoRed extends OpMode {
             leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 90
                     && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 90) {
-                driveSpeed = .1;
+                driveSpeed /= 2;
             }
         }
         else {
-            driveSpeed = .15;
             if(leftInches < 0) {
                 leftDriveFront.setPower(-Math.abs(speed));
                 leftDriveBack.setPower(-Math.abs(speed));
