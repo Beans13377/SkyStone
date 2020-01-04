@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
-public class MoveFoundationAutoRed extends OpMode {
+public class MoveFoundationAutoRedOldVersion extends OpMode {
     private DcMotor leftDriveMiddle = null;
     private DcMotor rightDriveMiddle = null;
     private DcMotor leftDriveFront = null;
@@ -68,41 +68,80 @@ public class MoveFoundationAutoRed extends OpMode {
         telemetry.update();
     }
     private void autonomous () {
-        if (autoStage == 0) {
-            encoderDrive(driveSpeed, -15, -15);
+        if(autoStage == 0) {
+            encoderDrive(driveSpeed, -30, -30);
         }
         else if (autoStage == 1) {
-            encoderDrive(turnSpeed, -4.1875, 4.1875);
-        }
-        else if (autoStage == 2) {
-            encoderDrive(driveSpeed, -9, -9);
-        }
-        else if (autoStage == 3) {
-            encoderDrive(turnSpeed, 4.1875, -4.1875);
-        }
-        else if (autoStage == 4) {
-            encoderDrive(driveSpeed, -15, -15);
-        }
-        else if (autoStage == 5) {
             runtime.reset();
             lfoundationater.setPosition(.1);
             rfoundationater.setPosition(.9);
             autoStage ++;
         }
-        else if (autoStage == 6 && runtime.seconds() > 1) {
+        else if (autoStage == 2 && runtime.seconds() > 1) {
             encoderDrive(driveSpeed, 28, 28);
         }
-        else if (autoStage == 7) {
+        else if (autoStage == 3) {
+            encoderDrive(turnSpeed, 2,0);
+        }
+        else if (autoStage == 4) {
             runtime.reset();
             lfoundationater.setPosition(.9);
             rfoundationater.setPosition(.1);
             autoStage ++;
         }
-        else if (autoStage == 8 && runtime.seconds() > 1) {
+        else if (autoStage == 5 && runtime.seconds() > 1) {
             encoderDrive(turnSpeed, -4.1875, 4.1875);
         }
+        else if (autoStage == 6) {
+            encoderDrive (driveSpeed, 12, 12);
+        }
+        else if (autoStage == 7) {
+            encoderDrive(turnSpeed, -4.1875, 4.1875);
+        }
+        else if (autoStage == 8) {
+            encoderDrive(driveSpeed, 24, 24);
+        }
         else if (autoStage == 9) {
-            encoderDrive(driveSpeed, 45, 45);
+            encoderDrive(turnSpeed, -4.1875, 4.1875);
+        }
+        else if (autoStage == 10) {
+            encoderDrive(driveSpeed, 12, 12);
+        }
+        else if (autoStage == 11) {
+            encoderDrive(turnSpeed, 4.1875, -4.1875);
+        }
+        else if (autoStage == 12) {
+            runtime.reset();
+            lfoundationater.setPosition(.1);
+            rfoundationater.setPosition(.9);
+            autoStage ++;
+        }
+        else if (autoStage == 13 && runtime.seconds() > 1) {
+            encoderDrive(driveSpeed, -24, -24);
+        }
+        else if (autoStage == 14) {
+            runtime.reset();
+            lfoundationater.setPosition(.9);
+            rfoundationater.setPosition(.1);
+            autoStage ++;
+        }
+        else if (autoStage == 15 && runtime.seconds() > 1) {
+            encoderDrive(turnSpeed, 4.1875, -4.1875);
+        }
+        else if (autoStage == 16) {
+            encoderDrive(driveSpeed, 24, 24);
+        }
+        else if (autoStage == 17) {
+            encoderDrive(turnSpeed, 4.1875, -4.1875);
+        }
+        else if (autoStage == 18) {
+            encoderDrive(driveSpeed, 19, 19);
+        }
+        else if (autoStage == 19) {
+            encoderDrive(turnSpeed, -4.1875, 4.1875);
+        }
+        else if (autoStage == 20) {
+            encoderDrive(driveSpeed, 24,24);
         }
     }
     private void encoderDrive (double speed, double rightInches, double leftInches) {
@@ -140,7 +179,7 @@ public class MoveFoundationAutoRed extends OpMode {
                     && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 90) {
                 driveSpeed = .1;
             }
-        }
+    }
         else {
             driveSpeed = .15;
             if(leftInches < 0) {
