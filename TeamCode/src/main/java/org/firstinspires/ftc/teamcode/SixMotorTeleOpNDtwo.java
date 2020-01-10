@@ -86,7 +86,6 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         processIntake();
         intakeDirection();
         intake.setPower(currentIntakePower * intakeDirection);
-        telemetry.addData("Intake Motor Direction", intakeDirection);
 
 //        driveToDepot();
 //        telemetry.addData("encodersAreBusy", encodersAreBusy);
@@ -98,23 +97,36 @@ public class SixMotorTeleOpNDtwo extends OpMode {
 //        driveToSkyBridge();
         outakeStone();
         double drive = -gamepad1.left_stick_y;
-            double turn = gamepad1.right_stick_x / 2.0;
+        double turn = gamepad1.right_stick_x / 2.0;
 
-            double leftPower = Range.clip(drive + turn, -1.0, 1.0);
-            double rightPower = Range.clip(drive - turn, -1.0, 1.0);
+        double leftPower = Range.clip(drive + turn, -1.0, 1.0);
+        double rightPower = Range.clip(drive - turn, -1.0, 1.0);
 
+        releaseCapstone();
+        moveFoundation();
+        double drive2 = -gamepad2.left_stick_y / 2;
+        double turn2 = -gamepad2.right_stick_x / 2;
+        double leftPower2 = Range.clip(drive2 + turn2, -.5, .5);
+        double rightPower2 = Range.clip(drive2 - turn2, -.5, .5);
+        if (leftPower == 0 && rightPower == 0) {
+            leftDriveMiddle.setPower(leftPower2);
+            rightDriveMiddle.setPower(rightPower2);
+            leftDriveFront.setPower(leftPower2);
+            rightDriveFront.setPower(rightPower2);
+            leftDriveBack.setPower(leftPower2);
+            rightDriveBack.setPower(rightPower2);
+        } else {
             leftDriveMiddle.setPower(leftPower);
             rightDriveMiddle.setPower(rightPower);
             leftDriveFront.setPower(leftPower);
             rightDriveFront.setPower(rightPower);
             leftDriveBack.setPower(leftPower);
             rightDriveBack.setPower(rightPower);
-        releaseCapstone();
-        moveFoundation();
+        }
     }
 
     private void processIntake() {
-        boolean current = gamepad1.b;
+        boolean current = gamepad1.b || gamepad2.b;
         if (current == lastPowerToggle) {
             return;
         } else if (!lastPowerToggle && current) {
@@ -445,19 +457,19 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         }
     }
     private void releaseCapstone () {
-        if (gamepad1.x) {
+        if (gamepad1.x || gamepad2.x) {
             capstoneRelease.setPosition(.6);
         }
-        else if (gamepad1.y) {
+        else if (gamepad1.y || gamepad2.y) {
             capstoneRelease.setPosition(.1);
         }
     }
     private void moveFoundation () {
-        if (gamepad1.dpad_right) {
+        if (gamepad1.dpad_right || gamepad2.dpad_right) {
             lfoundationater.setPosition(.1);
             rfoundationater.setPosition(.9);
         }
-        else if (gamepad1.dpad_left) {
+        else if (gamepad1.dpad_left || gamepad2.dpad_left) {
             lfoundationater.setPosition(.9);
             rfoundationater.setPosition(.1);
         }
