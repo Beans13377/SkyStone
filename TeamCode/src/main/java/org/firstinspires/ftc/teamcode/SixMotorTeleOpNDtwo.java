@@ -105,23 +105,24 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         releaseCapstone();
         moveFoundation();
         double drive2 = -gamepad2.left_stick_y / 2;
-        double turn2 = -gamepad2.right_stick_x / 2;
+        double turn2 = gamepad2.right_stick_x / 2;
         double leftPower2 = Range.clip(drive2 + turn2, -.5, .5);
         double rightPower2 = Range.clip(drive2 - turn2, -.5, .5);
-        if (leftPower == 0 && rightPower == 0) {
-            leftDriveMiddle.setPower(leftPower2);
-            rightDriveMiddle.setPower(rightPower2);
-            leftDriveFront.setPower(leftPower2);
-            rightDriveFront.setPower(rightPower2);
-            leftDriveBack.setPower(leftPower2);
-            rightDriveBack.setPower(rightPower2);
-        } else {
+        if (Math.abs(gamepad2.left_stick_y) < .15 && Math.abs(gamepad2.right_stick_x) < .15) {
             leftDriveMiddle.setPower(leftPower);
             rightDriveMiddle.setPower(rightPower);
             leftDriveFront.setPower(leftPower);
             rightDriveFront.setPower(rightPower);
             leftDriveBack.setPower(leftPower);
             rightDriveBack.setPower(rightPower);
+        } else {
+
+            leftDriveMiddle.setPower(leftPower2);
+            rightDriveMiddle.setPower(rightPower2);
+            leftDriveFront.setPower(leftPower2);
+            rightDriveFront.setPower(rightPower2);
+            leftDriveBack.setPower(leftPower2);
+            rightDriveBack.setPower(rightPower2);
         }
     }
 

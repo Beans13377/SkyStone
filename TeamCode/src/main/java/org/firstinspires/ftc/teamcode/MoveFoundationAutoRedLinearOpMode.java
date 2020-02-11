@@ -22,7 +22,7 @@ public class MoveFoundationAutoRedLinearOpMode extends LinearOpMode {
     private static final double countsPerInch = countsPerMotorRev / (wheelDiameter * 3.1415);
     private ElapsedTime runtime = new ElapsedTime();
     private double driveSpeed = .5;
-    private double turnSpeed = .3;
+    private double turnSpeed = .5;
 
     @Override
     public void runOpMode() {
@@ -51,11 +51,20 @@ public class MoveFoundationAutoRedLinearOpMode extends LinearOpMode {
 
         waitForStart();
 
-        encoderDrive(driveSpeed, -30, -30, 3);
+        encoderDrive(driveSpeed, -15, -15, 3);
+        encoderDrive(turnSpeed, -4.1875, 4.1875, 3);
+        encoderDrive(driveSpeed, -9, -9, 3);
+        encoderDrive(turnSpeed, 4.1875, -4.1875, 3);
+        encoderDrive(driveSpeed, -15, -15, 3);
         lfoundationater.setPosition(.1);
         rfoundationater.setPosition(.9);
         sleep(1000);
-        encoderDrive(driveSpeed, 25, 25, 2);
+        encoderDrive(driveSpeed, 28, 28, 5);
+        lfoundationater.setPosition(.9);
+        rfoundationater.setPosition(.1);
+        sleep(1000);
+        encoderDrive(turnSpeed, -4.1875, 4.1875, 3);
+        encoderDrive(driveSpeed, 45, 45, 3);
     }
     private void encoderDrive (double speed, double rightInches, double leftInches, double timeouts) {
 
@@ -73,12 +82,39 @@ public class MoveFoundationAutoRedLinearOpMode extends LinearOpMode {
             runtime.reset();
             leftDriveMiddle.setPower(Math.abs(speed));
             rightDriveMiddle.setPower(Math.abs(speed));
+            if(leftInches < 0) {
+                leftDriveFront.setPower(-Math.abs(speed));
+                leftDriveBack.setPower(-Math.abs(speed));
+            }
+            else {
+                leftDriveFront.setPower(Math.abs(speed));
+                leftDriveBack.setPower(Math.abs(speed));
+            }
+            if (rightInches < 0) {
+                rightDriveFront.setPower(-Math.abs(speed));
+                rightDriveBack.setPower(-Math.abs(speed));
+            }
+            else {
+                rightDriveFront.setPower(Math.abs(speed));
+                rightDriveBack.setPower(Math.abs(speed));
+            }
 
-            if (opModeIsActive() && (runtime.seconds() < timeouts) &&
-                    (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) < 2) &&
-                    Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) < 2) {
+            if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) < 50 &&
+            Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) < 50 && opModeIsActive() && (runtime.seconds() < timeouts)) {
+                rightDriveFront.setPower(0);
+                leftDriveFront.setPower(0);
+                rightDriveBack.setPower(0);
+                leftDriveBack.setPower(0);
+            }
+            else if (opModeIsActive() && (runtime.seconds() < timeouts) &&
+                    (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) < 10) &&
+                    Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) < 10) {
                 leftDriveMiddle.setPower(0);
                 rightDriveMiddle.setPower(0);
+                leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
                 leftDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 rightDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

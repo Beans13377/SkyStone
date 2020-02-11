@@ -22,12 +22,13 @@ public class MoveFoundationAutoRed extends OpMode {
     private static final double countsPerMotorRev = 383.6;
     private static final double wheelDiameter = 4;
     private static final double countsPerInch = countsPerMotorRev / (wheelDiameter * 3.1415);
-    private static double driveSpeed = .15;
-    private static double turnSpeed = .075;
+    private static final double driveSpeed = .5;
+    private static final double turnSpeed = .4;
     private boolean encodersAreBusy = false;
     private ElapsedTime runtime = new ElapsedTime();
 
     private int autoStage = 0;
+
 
     @Override
     public void init () {
@@ -53,10 +54,10 @@ public class MoveFoundationAutoRed extends OpMode {
         rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDriveMiddle.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftDriveMiddle.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     @Override
     public void start () {
@@ -65,20 +66,19 @@ public class MoveFoundationAutoRed extends OpMode {
     public void loop () {
         autonomous();
         telemetry.addData("auto stage", autoStage);
-
     }
     private void autonomous () {
         if (autoStage == 0) {
             encoderDrive(driveSpeed, -15, -15);
         }
         else if (autoStage == 1) {
-            encoderDrive(turnSpeed, -4.1875, 4.1875);
+            encoderDrive(turnSpeed, -13.1554, 13.1554);
         }
         else if (autoStage == 2) {
             encoderDrive(driveSpeed, -9, -9);
         }
         else if (autoStage == 3) {
-            encoderDrive(turnSpeed, 4.1875, -4.1875);
+            encoderDrive(turnSpeed, 13.1554, -13.1554);
         }
         else if (autoStage == 4) {
             encoderDrive(driveSpeed, -15, -15);
@@ -87,7 +87,7 @@ public class MoveFoundationAutoRed extends OpMode {
             runtime.reset();
             lfoundationater.setPosition(.1);
             rfoundationater.setPosition(.9);
-            autoStage ++;
+            autoStage++;
         }
         else if (autoStage == 6 && runtime.seconds() > 1) {
             encoderDrive(driveSpeed, 28, 28);
@@ -96,10 +96,10 @@ public class MoveFoundationAutoRed extends OpMode {
             runtime.reset();
             lfoundationater.setPosition(.9);
             rfoundationater.setPosition(.1);
-            autoStage ++;
+            autoStage++;
         }
         else if (autoStage == 8 && runtime.seconds() > 1) {
-            encoderDrive(turnSpeed, -4.1875, 4.1875);
+            encoderDrive(turnSpeed, -13.1554, 13.1554);
         }
         else if (autoStage == 9) {
             encoderDrive(driveSpeed, 45, 45);
@@ -110,8 +110,7 @@ public class MoveFoundationAutoRed extends OpMode {
         int newRightTarget;
 
         if (!encodersAreBusy) {
-            leftDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
             newLeftTarget = leftDriveMiddle.getCurrentPosition() + (int) (leftInches * countsPerInch);
             newRightTarget = rightDriveMiddle.getCurrentPosition() + (int) (rightInches * countsPerInch);
             leftDriveMiddle.setTargetPosition(newLeftTarget);
@@ -125,8 +124,10 @@ public class MoveFoundationAutoRed extends OpMode {
         }
 
 
-        if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 500
-                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 500) {
+        if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 100 &&
+                Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) >= 10
+                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 100 &&
+                Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) >= 10) {
             rightDriveFront.setPower(0);
             rightDriveBack.setPower(0);
             leftDriveFront.setPower(0);
@@ -135,9 +136,21 @@ public class MoveFoundationAutoRed extends OpMode {
             rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 90
-                    && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 90) {
-                driveSpeed /= 2;
+            if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 60
+                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 60) {
+
+                if(leftInches < 0) {
+                    leftDriveMiddle.setPower((-Math.abs(speed)) / 2);
+                }
+                else {
+                    leftDriveMiddle.setPower((Math.abs(speed)) / 2);
+                }
+                if (rightInches < 0) {
+                    rightDriveMiddle.setPower((-Math.abs(speed)) / 2);
+                }
+                else {
+                    rightDriveMiddle.setPower((Math.abs(speed)) / 2);
+                }
             }
         }
         else {
@@ -158,10 +171,15 @@ public class MoveFoundationAutoRed extends OpMode {
                 rightDriveBack.setPower(Math.abs(speed));
             }
         }
-        if (autoStage == 0 && leftDriveMiddle.getTargetPosition() > leftDriveMiddle.getCurrentPosition()
-                && rightDriveMiddle.getTargetPosition() > rightDriveMiddle.getCurrentPosition()) {
+        if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 10
+                && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 10 && encodersAreBusy) {
+
             leftDriveMiddle.setPower(0);
             rightDriveMiddle.setPower(0);
+            rightDriveFront.setPower(0);
+            rightDriveBack.setPower(0);
+            leftDriveFront.setPower(0);
+            leftDriveBack.setPower(0);
             leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -170,24 +188,9 @@ public class MoveFoundationAutoRed extends OpMode {
             leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             encodersAreBusy = false;
-            autoStage ++;
-        }
-        else if (encodersAreBusy) {
-            if (Math.abs(leftDriveMiddle.getCurrentPosition() - leftDriveMiddle.getTargetPosition()) <= 10
-                    && Math.abs(rightDriveMiddle.getCurrentPosition() - rightDriveMiddle.getTargetPosition()) <= 10) {
-
-                leftDriveMiddle.setPower(0);
-                rightDriveMiddle.setPower(0);
-                leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-                encodersAreBusy = false;
-                autoStage ++;
-            }
+            leftDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            autoStage++;
         }
     }
 }
