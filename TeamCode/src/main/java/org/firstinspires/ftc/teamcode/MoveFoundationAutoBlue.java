@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
-public class ParkOnLineAuto2 extends OpMode {
+public class MoveFoundationAutoBlue extends OpMode {
     private DcMotor leftDriveMiddle = null;
     private DcMotor rightDriveMiddle = null;
     private DcMotor leftDriveFront = null;
@@ -22,7 +22,7 @@ public class ParkOnLineAuto2 extends OpMode {
     private static final double countsPerMotorRev = 383.6;
     private static final double wheelDiameter = 4;
     private static final double countsPerInch = countsPerMotorRev / (wheelDiameter * 3.1415);
-    private static final double driveSpeed = .4;
+    private static final double driveSpeed = .5;
     private static final double turnSpeed = .4;
     private boolean encodersAreBusy = false;
     private ElapsedTime runtime = new ElapsedTime();
@@ -66,12 +66,70 @@ public class ParkOnLineAuto2 extends OpMode {
     public void loop () {
         autonomous();
         telemetry.addData("auto stage", autoStage);
-        telemetry.addData("left encoder", leftDriveMiddle.getCurrentPosition());
-        telemetry.addData("right encoder", rightDriveMiddle.getCurrentPosition());
     }
     private void autonomous () {
         if (autoStage == 0) {
-            encoderDrive(driveSpeed, 8, 8);
+            encoderDrive(driveSpeed, -15, -15);
+        }
+        else if (autoStage == 1) {
+            encoderDrive(turnSpeed, 13.1554, -13.1554);
+        }
+        else if (autoStage == 2) {
+            encoderDrive(driveSpeed, -9, -9);
+        }
+        else if (autoStage == 3) {
+            encoderDrive(turnSpeed, -13.1554, 13.1554);
+        }
+        else if (autoStage == 4) {
+            encoderDrive(driveSpeed, -15, -15);
+        }
+        else if (autoStage == 5) {
+            runtime.reset();
+            lfoundationater.setPosition(.1);
+            rfoundationater.setPosition(.9);
+            autoStage++;
+        }
+        else if (autoStage == 6 && runtime.seconds() > 1) {
+            encoderDrive(driveSpeed, 26, 26);
+        }
+        else if (autoStage == 7) {
+            runtime.reset();
+            lfoundationater.setPosition(.9);
+            rfoundationater.setPosition(.1);
+            autoStage++;
+        }
+        else if (autoStage == 8 && runtime.seconds() > 1) {
+            encoderDrive(turnSpeed, 13.1554, -13.1554);
+        }
+        else if (autoStage == 9) {
+            encoderDrive(driveSpeed, 30, 30);
+        }
+        else if (autoStage == 10) {
+            encoderDrive(turnSpeed, 13, -13);
+        }
+        else if (autoStage == 11) {
+            encoderDrive(driveSpeed, 48, 48);
+        }
+        else if (autoStage == 12) {
+            encoderDrive(turnSpeed, -13.1554, 13.1554);
+        }
+        else if (autoStage == 13) {
+            encoderDrive(driveSpeed, -24, -24);
+        }
+        else if (autoStage == 14) {
+            encoderDrive(turnSpeed, 13.1554, -13.1554);
+        }
+        else if (autoStage == 15) {
+            encoderDrive(driveSpeed, -24, -24);
+        }
+        else if (autoStage == 16) {
+            encoderDrive(driveSpeed, 12, 12);
+        }
+        else if (autoStage == 17) {
+            encoderDrive(turnSpeed, -13.1554, 13.1554);
+        }
+        else if (autoStage == 18) {
+            encoderDrive(driveSpeed, 24, 24);
         }
     }
     private void encoderDrive (double speed, double rightInches, double leftInches) {

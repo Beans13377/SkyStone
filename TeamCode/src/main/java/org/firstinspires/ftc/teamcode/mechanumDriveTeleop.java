@@ -116,10 +116,10 @@ public class mechanumDriveTeleop extends OpMode{
 //        }
 //        lastUpdateTime = currTime;
 
-        double fl_power_raw = movement_y+movement_turn+movement_x;
-        double bl_power_raw = movement_y+movement_turn-movement_x;
-        double br_power_raw = -movement_y+movement_turn-movement_x;
-        double fr_power_raw = -movement_y+movement_turn+movement_x;
+        double fl_power_raw = -movement_y+movement_turn+movement_x;
+        double bl_power_raw = -movement_y+movement_turn-movement_x;
+        double br_power_raw = -movement_y-movement_turn+movement_x;
+        double fr_power_raw = -movement_y-movement_turn-movement_x;
 
         //find the maximum of the powers
         double maxRawPower = Math.abs(fl_power_raw);
@@ -143,6 +143,15 @@ public class mechanumDriveTeleop extends OpMode{
         leftback.setPower(-bl_power_raw);
         rightback.setPower(-br_power_raw);
         rightfront.setPower(-fr_power_raw);
+
+//        if(movement_turn > .2) {
+//            leftfront.setPower(fl_power_raw);
+//            leftback.setPower(bl_power_raw);
+//        }
+//        else if (movement_turn < .2) {
+//            rightfront.setPower(fr_power_raw);
+//            rightback.setPower(br_power_raw);
+//        }
     }
     private void processIntake() {
         boolean current = gamepad1.b || gamepad2.b;

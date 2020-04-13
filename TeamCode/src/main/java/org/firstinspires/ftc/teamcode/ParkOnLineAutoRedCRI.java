@@ -8,13 +8,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
-public class ParkOnLineAuto2 extends OpMode {
+public class ParkOnLineAutoRedCRI extends OpMode {
     private DcMotor leftDriveMiddle = null;
     private DcMotor rightDriveMiddle = null;
     private DcMotor leftDriveFront = null;
     private DcMotor leftDriveBack = null;
     private DcMotor rightDriveFront = null;
     private DcMotor rightDriveBack = null;
+    private DcMotor tapemeasure = null;
     private Servo lfoundationater = null;
     private Servo rfoundationater = null;
     private Servo capstoneRelease = null;
@@ -22,8 +23,8 @@ public class ParkOnLineAuto2 extends OpMode {
     private static final double countsPerMotorRev = 383.6;
     private static final double wheelDiameter = 4;
     private static final double countsPerInch = countsPerMotorRev / (wheelDiameter * 3.1415);
-    private static final double driveSpeed = .4;
-    private static final double turnSpeed = .4;
+    private static final double driveSpeed = .5;
+    private static final double turnSpeed = .2;
     private boolean encodersAreBusy = false;
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -39,6 +40,7 @@ public class ParkOnLineAuto2 extends OpMode {
         rightDriveFront = hardwareMap.get(DcMotor.class, "right_drive_front");
         leftDriveBack = hardwareMap.get(DcMotor.class, "left_drive_back");
         rightDriveBack = hardwareMap.get(DcMotor.class, "right_drive_back");
+        tapemeasure = hardwareMap.get(DcMotor.class, "tm");
         lfoundationater = hardwareMap.servo.get("lfoundationater");
         rfoundationater = hardwareMap.servo.get("rfoundationater");
         capstoneRelease = hardwareMap.servo.get ("capstoneRelease");
@@ -48,12 +50,14 @@ public class ParkOnLineAuto2 extends OpMode {
         rightDriveBack.setDirection(DcMotorSimple.Direction.REVERSE);
         leftDriveFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftDriveBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        tapemeasure.setDirection(DcMotorSimple.Direction.REVERSE);
         leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        tapemeasure.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDriveMiddle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -66,12 +70,20 @@ public class ParkOnLineAuto2 extends OpMode {
     public void loop () {
         autonomous();
         telemetry.addData("auto stage", autoStage);
-        telemetry.addData("left encoder", leftDriveMiddle.getCurrentPosition());
-        telemetry.addData("right encoder", rightDriveMiddle.getCurrentPosition());
     }
     private void autonomous () {
         if (autoStage == 0) {
-            encoderDrive(driveSpeed, 8, 8);
+            runtime.reset();
+            autoStage ++;
+        }
+        else if (autoStage == 1) {
+            encoderDrive(driveSpeed, 59, 59);
+        }
+        else if (autoStage == 2 && runtime.seconds() > 24) {
+            encoderDrive(turnSpeed, -5.5, 5.5);
+        }
+        else if (autoStage == 3 && runtime.seconds() > 28) {
+            tapemeasure.setPower(1);
         }
     }
     private void encoderDrive (double speed, double rightInches, double leftInches) {

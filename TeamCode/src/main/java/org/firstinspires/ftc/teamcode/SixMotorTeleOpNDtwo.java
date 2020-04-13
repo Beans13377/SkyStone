@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -16,10 +17,12 @@ public class SixMotorTeleOpNDtwo extends OpMode {
     private DcMotor rightDriveFront = null;
     private DcMotor rightDriveBack = null;
     private DcMotor intake = null;
+    private DcMotor tapemeasure = null;
     private Servo outake = null;
     private Servo capstoneRelease = null;
     private Servo lfoundationater = null;
     private Servo rfoundationater = null;
+    private Servo outakePush = null;
 
     private boolean lastPowerToggle = false;
     private boolean isIntakePowerOn = false;
@@ -52,10 +55,12 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         leftDriveBack = hardwareMap.get(DcMotor.class, "left_drive_back");
         rightDriveBack = hardwareMap.get(DcMotor.class, "right_drive_back");
         intake = hardwareMap.get(DcMotor.class, "intake");
+        tapemeasure = hardwareMap.get(DcMotor.class, "tm");
         outake = hardwareMap.servo.get ("outake");
         capstoneRelease = hardwareMap.servo.get ("capstoneRelease");
         lfoundationater = hardwareMap.servo.get("lfoundationater");
         rfoundationater = hardwareMap.servo.get("rfoundationater");
+        outakePush = hardwareMap.servo.get("outakePush");
         leftDriveMiddle.setDirection(DcMotor.Direction.FORWARD);
         rightDriveMiddle.setDirection(DcMotor.Direction.REVERSE);
         leftDriveFront.setDirection(DcMotor.Direction.FORWARD);
@@ -63,6 +68,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         leftDriveBack.setDirection(DcMotor.Direction.FORWARD);
         rightDriveBack.setDirection(DcMotor.Direction.REVERSE);
         intake.setDirection(DcMotor.Direction.REVERSE);
+        tapemeasure.setDirection(DcMotorSimple.Direction.REVERSE);
         leftDriveFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -70,6 +76,7 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         rightDriveMiddle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDriveBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        tapemeasure.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDriveMiddle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDriveMiddle.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -104,6 +111,8 @@ public class SixMotorTeleOpNDtwo extends OpMode {
 
         releaseCapstone();
         moveFoundation();
+        outakeStoneWithoutInertia();
+        fireTapemeasure();
         double drive2 = -gamepad2.left_stick_y / 2;
         double turn2 = gamepad2.right_stick_x / 2;
         double leftPower2 = Range.clip(drive2 + turn2, -.5, .5);
@@ -473,6 +482,24 @@ public class SixMotorTeleOpNDtwo extends OpMode {
         else if (gamepad1.dpad_left || gamepad2.dpad_left) {
             lfoundationater.setPosition(.9);
             rfoundationater.setPosition(.1);
+        }
+    }
+    private void outakeStoneWithoutInertia () {
+        if (gamepad2.dpad_up || gamepad1.dpad_up) {
+            outakePush.setPosition(0);
+            outake.setPosition(.15);
+        }
+        else if (gamepad2.dpad_down || gamepad1.dpad_down) {
+            outakePush.setPosition(1);
+            outake.setPosition(.3);
+        }
+    }
+    private void fireTapemeasure () {
+        if (gamepad1.right_trigger > .1 || gamepad1.left_trigger > .1) {
+            tapemeasure.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+        }
+        else {
+            tapemeasure.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
         }
     }
 }

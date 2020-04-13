@@ -7,14 +7,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous
-public class MoveFoundationAutoRedOldVersion extends OpMode {
-    private DcMotor leftDriveMiddle = null;
-    private DcMotor rightDriveMiddle = null;
-    private DcMotor leftDriveFront = null;
-    private DcMotor leftDriveBack = null;
-    private DcMotor rightDriveFront = null;
-    private DcMotor rightDriveBack = null;
+    @Autonomous
+    public class MoveFoundationAutoRedOldVersion extends OpMode {
+        private DcMotor leftDriveMiddle = null;
+        private DcMotor rightDriveMiddle = null;
+        private DcMotor leftDriveFront = null;
+        private DcMotor leftDriveBack = null;
+        private DcMotor rightDriveFront = null;
+        private DcMotor rightDriveBack = null;
     private Servo lfoundationater = null;
     private Servo rfoundationater = null;
     private Servo capstoneRelease = null;

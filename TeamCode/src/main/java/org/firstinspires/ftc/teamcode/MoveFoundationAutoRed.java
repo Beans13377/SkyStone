@@ -90,7 +90,7 @@ public class MoveFoundationAutoRed extends OpMode {
             autoStage++;
         }
         else if (autoStage == 6 && runtime.seconds() > 1) {
-            encoderDrive(driveSpeed, 28, 28);
+            encoderDrive(driveSpeed, 26, 26);
         }
         else if (autoStage == 7) {
             runtime.reset();
@@ -102,7 +102,10 @@ public class MoveFoundationAutoRed extends OpMode {
             encoderDrive(turnSpeed, -13.1554, 13.1554);
         }
         else if (autoStage == 9) {
-            encoderDrive(driveSpeed, 45, 45);
+            encoderDrive(driveSpeed, 30, 30);
+        }
+        else if (autoStage == 10) {
+            encoderDrive(turnSpeed, -13, 13);
         }
     }
     private void encoderDrive (double speed, double rightInches, double leftInches) {
